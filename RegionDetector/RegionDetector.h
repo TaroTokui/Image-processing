@@ -1,77 +1,74 @@
 /*****************************************
-	�w�i�����N���X�uRegionDetector�v
-		�֊s�����o���g���������ȃ��x�����O���s���N���X
-		2009/08/24	by �Ƃ���
+	RegionDetectorÅv
+		輪郭線検出を使った高速なラベリングを行う
+		2009/08/24	by Taro Tokui
 
-	�T�v�F
-	�@�o�C�i���摜���󂯎��
-	  �̈敪�����s����
-		�e�̈���l�p�`�ň͂񂾉摜��Ԃ�
+	abstract:
+        get a binaly image
+	  óÃàÊï™äÑÇçsÇ¡Çƒ
+		äeóÃàÊÇéläpå`Ç≈àÕÇÒÇæâÊëúÇï‘Ç∑
 
  *****************************************/
 
 #pragma once
 
-#include <stdlib.h>
-#include <cv.h>
-#include <cxcore.h>
-#include <cvaux.h>
-#include <highgui.h>
+#include <iostream>
+#include <opencv2/opencv.hpp>
 
 #define REGION_MIN 20
 #define REGION_MAX 500
 
-/* ���x�����O�p�̈���̐錾 */
+/* ÉâÉxÉäÉìÉOópóÃàÊèÓïÒÇÃêÈåæ */
 typedef struct{
-	CvSeq *contourPtr;					// �̈�̗֊s���
-	CvPoint2D32f centroid;			// �̈�̏d�S
-	CvRect boundingBox;					// �̈�̃o�E���f�B���O�{�b�N�X
-	float size;									// �̈�̖ʐ�
+	CvSeq *contourPtr;					// óÃàÊÇÃó÷äsèÓïÒ
+	CvPoint2D32f centroid;			// óÃàÊÇÃèdêS
+	CvRect boundingBox;					// óÃàÊÇÃÉoÉEÉìÉfÉBÉìÉOÉ{ÉbÉNÉX
+	float size;									// óÃàÊÇÃñ êœ
 } Region;
 
 class RegionDetector{
 
 public:
 
-	/* �R���X�g���N�^ */
+	/* ÉRÉìÉXÉgÉâÉNÉ^ */
 	RegionDetector(IplImage* srcImage, int numMaxRegion);
 	
-	/* �f�X�g���N�^ */
+	/* ÉfÉXÉgÉâÉNÉ^ */
 	~RegionDetector();
 
-	/* �摜���擾���A���x���t�����ĕԂ��֐� */
+	/* âÊëúÇéÊìæÇµÅAÉâÉxÉãïtÇØÇµÇƒï‘Ç∑ä÷êî */
 	void label(IplImage *srcBinarizedImage);
 
-	/* MemStorage������A�y��Region�\���̂�����������B
-		 �����[�v�̍Ō�ɂ����MemStorage��������� */
+	/* MemStorageÇâï˙ÅAãyÇ—Regionç\ë¢ëÃÇèâä˙âªÇ∑ÇÈÅB
+		 ñàÉãÅ[ÉvÇÃç≈å„Ç…Ç±ÇÍÇ≈MemStorageÇâï˙Ç∑ÇÈ */
 	void cleanUpRegions();
 
-	/* ���x���t�������̈��ID�̐�,�ʐ�,�ʒu,�������邩���擾���� */
+	/* ÉâÉxÉãïtÇØÇµÇΩóÃàÊÇÃIDÇÃêî,ñ êœ,à íu,Ç¢Ç≠Ç¬Ç†ÇÈÇ©ÇéÊìæÇ∑ÇÈ */
 	//void getRegions(Region* regions, int numRegions);
 	Region* getRegions();
 	int getNumRegions();
 
 private:
 
-	/* ���x�����O�p�ϐ� */
-	Region *regions;							// Region�z��
+	/* ÉâÉxÉäÉìÉOópïœêî */
+	Region *regions;							// RegionîzóÒ
 	CvMemStorage *storage;
-	IplImage *tmpLabeledImage;	// ���x���t���̉ߒ��Ŏg��
-	int numMaxRegion;						// region�̍ő��
-	int numRegions;							// region�̌����J�E���g����
+	IplImage *tmpLabeledImage;	// ÉâÉxÉãïtÇØÇÃâﬂíˆÇ≈égÇ§
+	int numMaxRegion;						// regionÇÃç≈ëÂå¬êî
+	int numRegions;							// regionÇÃå¬êîÇÉJÉEÉìÉgÇ∑ÇÈ
 
-	/* Region�\���̂̔z������ */
+	/* Regionç\ë¢ëÃÇÃîzóÒÇçÏÇÈ */
 	Region* createRegions();
 
-	/* Region�\���̂̔z���������� */
+	/* Regionç\ë¢ëÃÇÃîzóÒÇâï˙Ç∑ÇÈ */
 	void releaseRegions();
 
-	/* �֊s�����o���g���ă��x�����O���s���֐��B
-		 ��1����: 2�l�摜�B
-		 ��2�A��3����: ���o����̈�̖ʐ�臒l�B
-		 ��4����: ���ʂ���������Region�\���̂̔z��B
-		 ��5����: Region�\���̂̔z��̃T�C�Y�B
-		 �߂�l�Ō��o�����̈�̐���Ԃ��B */
+	/* ó÷äsê¸åüèoÇégÇ¡ÇƒÉâÉxÉäÉìÉOÇçsÇ§ä÷êîÅB
+		 ëÊ1à¯êî: 2ílâÊëúÅB
+		 ëÊ2ÅAëÊ3à¯êî: åüèoÇ∑ÇÈóÃàÊÇÃñ êœËáílÅB
+		 ëÊ4à¯êî: åãâ ÇèëÇ´çûÇﬁRegionç\ë¢ëÃÇÃîzóÒÅB
+		 ëÊ5à¯êî: Regionç\ë¢ëÃÇÃîzóÒÇÃÉTÉCÉYÅB
+		 ñﬂÇËílÇ≈åüèoÇµÇΩóÃàÊÇÃêîÇï‘Ç∑ÅB */
 	int detectRegions(IplImage *srcBinarizedImageGRAY, float maxSize, float minSize, Region *resultRegions, int NUM_MAX_REGIONS);
 
 };
